@@ -29,11 +29,6 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
-#    slack_cl.chat_postMessage(
-#      token: ENV["S_TOKEN"],
-#      channel: params[:channel_name],
-#      text: "https://www.youtube.com/watch?v=#{y_id}"
-    #    )
     atta = [
       {
         text: "ボタンを選択してください",
