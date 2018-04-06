@@ -95,7 +95,7 @@ post '/results' do
     return message_response("ありがとう！\n#{uname}のレビューを受け付けたよ！(選択したレビュー：#{vote}",
                             response_type: "ephemeral")
   else
-    "不正な値です。bot製作者(tsakurai)に連絡してください。"
+    "不正な値です。bot管理者に連絡してください。"
   end
   ""
 end
