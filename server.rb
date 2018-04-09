@@ -1,4 +1,3 @@
-# coding: utf-8
 require 'sinatra'
 require 'slack-ruby-client'
 require 'dotenv'
@@ -8,8 +7,8 @@ require './lib/database.rb'
 help =<<EOS
 breaktubeとは？
 
-みんなが自由に追加することができるプレイリストのようなものです。
-`/breaktube` => リストからランダムに再生
+みんなが自由に追加することができるプレイリストのようなものです。
+`/breaktube` => リストからランダムに再生
 `/breaktube add=ID` => 動画の?v=以降のidをadd=の後ろに入力するとbreaktubeに動画を追加
 EOS
 
@@ -31,7 +30,7 @@ post '/' do
     y_id = db.rand_pick
     atta = [
       {
-        text: "ボタンを選択してください",
+        text: "ボタンを選択してください",
         fallback: "評価を受け付けました",
         callback_id: "review=#{y_id}",
         color: "#3AA3E3",
@@ -54,28 +53,28 @@ post '/' do
     ]
     p atta
     return message_response(
-      "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
-      attachments: atta
-    )
+             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
+             attachments: atta
+           )
 
   when /add=/ then
-    y_id = params[:text][/add=([a-zA-Z0-9_\-]+)/,1]
-    return message_response("不正なIDです。") if y_id.nil?
+    y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
+    return message_response("不正なIDです。") if y_id.nil?
     uname = params[:user_name]
     if db.youtube_id_search?(y_id) and link_check?(y_id)
       db.playlists_insert(user_name = uname, youtube_id = y_id)
       slack_cl.chat_postMessage(channel: "breaktube-log", text: "#{params[:user_name]} added #{y_id}")
       return message_response("ID追加に成功しました。")
     else
-      return message_response("すでに存在するIDです。") unless db.youtube_id_search?(y_id)
-      return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
+      return message_response("すでに存在するIDです。") unless db.youtube_id_search?(y_id)
+      return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
     end
 
   when /help/ then
     return message_response(help)
 
   else
-    return message_response("不正な値です。")
+    return message_response("不正な値です。")
   end
 end
 
@@ -90,12 +89,12 @@ post '/results' do
     y_id = results["callback_id"][/review=(.+)/,1]
     uname = results["user"]["name"]
     vote = results["actions"][0]["value"]
-    p message_response("ありがとう！\n#{uname}のレビューを受け付けたよ！(選択したレビュー：#{vote}",
+    p message_response("ありがとう！\n#{uname}のレビューを受け付けたよ！(選択したレビュー：#{vote}",
                        response_type: "ephemeral")
-    return message_response("ありがとう！\n#{uname}のレビューを受け付けたよ！(選択したレビュー：#{vote}",
+    return message_response("ありがとう！\n#{uname}のレビューを受け付けたよ！(選択したレビュー：#{vote}",
                             response_type: "ephemeral")
   else
-    "不正な値です。bot管理者に連絡してください。"
+    "不正な値です。bot管理者に連絡してください。"
   end
   ""
 end
