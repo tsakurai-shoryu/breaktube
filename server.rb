@@ -1,4 +1,3 @@
-# coding: utf-8-hfs
 require 'sinatra'
 require 'slack-ruby-client'
 require 'dotenv'
