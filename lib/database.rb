@@ -22,6 +22,11 @@ class DataBase
                [user_name, youtube_id, c_at])
   end
 
+  def playlists_count
+    db = SQLite3::Database.new @dbenv
+    db.execute("SELECT COUNT(1) FROM playlists")
+  end
+
   def rand_pick
     db = SQLite3::Database.new @dbenv
     db.execute("SELECT youtube_id FROM playlists").flatten.sample
