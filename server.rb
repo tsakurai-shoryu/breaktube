@@ -1,4 +1,3 @@
-# coding: utf-8-hfs
 require 'sinatra'
 require 'slack-ruby-client'
 require 'dotenv'
@@ -54,12 +53,12 @@ post '/' do
     ]
     p atta
     return message_response(
-      "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
-      attachments: atta
-    )
+             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
+             attachments: atta
+           )
 
   when /add=/ then
-    y_id = params[:text][/add=([a-zA-Z0-9_\-]+)/,1]
+    y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
     return message_response("不正なIDです。") if y_id.nil?
     uname = params[:user_name]
     if db.youtube_id_search?(y_id) and link_check?(y_id)
