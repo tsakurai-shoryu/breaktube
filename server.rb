@@ -73,6 +73,9 @@ post '/' do
   when /help/ then
     return message_response(help)
 
+  when /count/ then
+    return message_response(db.playlists_count)
+
   else
     return message_response("不正な値です。")
   end
