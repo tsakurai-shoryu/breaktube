@@ -9,7 +9,7 @@ breaktubeとは？
 
 みんなが自由に追加することができるプレイリストのようなものです。
 `/breaktube` => リストからランダムに再生
-`/breaktube add=ID` => 動画の?v=以降のidをadd=の後ろに入力するとbreaktubeに動画を追加
+`/breaktube add=LINK` => add=の後ろにyoutubeのリンクを入力するとbreaktubeに動画を追加
 EOS
 
 Dotenv.load
