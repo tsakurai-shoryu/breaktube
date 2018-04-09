@@ -74,7 +74,6 @@ post '/' do
     return message_response(help)
 
   when /count/ then
-    p db.playlists_count
     return message_response(db.playlists_count)
 
   else
