@@ -8,9 +8,10 @@ help =<<EOS
 breaktubeとは？
 
 みんなが自由に追加することができるプレイリストのようなものです。
-`/breaktube` => リストからランダムに再生
-`/breaktube add=ID` => 動画のリンクをadd=の後ろに入力するとbreaktubeに動画を追加
-`/breaktube count` => 今breaktubeに登録されている曲数がわかる
+`/breaktube` => リストからランダムに再生。
+`/breaktube lastest10` => 最新追加10曲からランダムに再生。数字部分は変更可能。
+`/breaktube add=ID` => 動画のリンクをadd=の後ろに入力するとbreaktubeに動画を追加。
+`/breaktube count` => 今breaktubeに登録されている曲数がわかる。
 EOS
 
 Dotenv.load
@@ -29,6 +30,38 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
+    atta = [
+      {
+        text: "ボタンを選択してください",
+        fallback: "評価を受け付けました",
+        callback_id: "review=#{y_id}",
+        color: "#3AA3E3",
+        attachment_type: "default",
+        actions: [
+          {
+            name: "vote",
+            text: "Up vote :+1:",
+            type: "button",
+            value: "upvote"
+          },
+          {
+            name: "vote",
+            text: "Down vote :-1:",
+            type: "button",
+            value: "downvote"
+          }
+        ]
+      }
+    ]
+    p atta
+    return message_response(
+             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
+             attachments: atta
+           )
+
+  when /lastest/ then
+    sample_count = params[:text][/lastest(\d+)/,1].to_i
+    y_id = db.rand_pick(range: sample_count)
     atta = [
       {
         text: "ボタンを選択してください",

@@ -27,8 +27,16 @@ class DataBase
     db.execute("SELECT COUNT(1) FROM playlists").flatten[0]
   end
 
-  def rand_pick
+  def rand_pick(range: 0)
     db = SQLite3::Database.new @dbenv
-    db.execute("SELECT youtube_id FROM playlists").flatten.sample
+    sql = <<EOS
+SELECT youtube_id
+FROM(
+  SELECT id, youtube_id
+  FROM playlists
+EOS
+sql << "ORDER BY id DESC limit #{range}" if range != 0
+sql << ")"
+    db.execute(sql).flatten.sample
   end
 end
