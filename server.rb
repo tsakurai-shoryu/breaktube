@@ -58,6 +58,38 @@ post '/' do
              attachments: atta
            )
 
+  when "lastest" then
+    range = params[:text][/lastest([\d+)/,1]
+    y_id = db.rand_pick(range)
+    atta = [
+      {
+        text: "ボタンを選択してください",
+        fallback: "評価を受け付けました",
+        callback_id: "review=#{y_id}",
+        color: "#3AA3E3",
+        attachment_type: "default",
+        actions: [
+          {
+            name: "vote",
+            text: "Up vote :+1:",
+            type: "button",
+            value: "upvote"
+          },
+          {
+            name: "vote",
+            text: "Down vote :-1:",
+            type: "button",
+            value: "downvote"
+          }
+        ]
+      }
+    ]
+    p atta
+    return message_response(
+             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
+             attachments: atta
+           )
+
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
     return message_response("不正なIDです。") if y_id.nil?
