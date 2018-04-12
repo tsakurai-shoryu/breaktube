@@ -59,7 +59,7 @@ post '/' do
            )
 
   when "lastest" then
-    range = params[:text][/lastest([\d+)/,1]
+    range = params[:text][/lastest(\d+)/,1]
     y_id = db.rand_pick(range)
     atta = [
       {
