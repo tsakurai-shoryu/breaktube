@@ -58,7 +58,7 @@ post '/' do
              attachments: atta
            )
 
-  when "lastest" then
+  when /lastest/ then
     range = params[:text][/lastest(\d+)/,1].to_i
     y_id = db.rand_pick(range)
     atta = [
