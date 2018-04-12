@@ -59,8 +59,8 @@ post '/' do
            )
 
   when /lastest/ then
-    range = params[:text][/lastest(\d+)/,1].to_i
-    y_id = db.rand_pick(range)
+    sample_count = params[:text][/lastest(\d+)/,1].to_i
+    y_id = db.rand_pick(range: sample_count)
     atta = [
       {
         text: "ボタンを選択してください",
