@@ -28,6 +28,7 @@ class DataBase
   end
 
   def rand_pick(range: 0)
+    p range
     db = SQLite3::Database.new @dbenv
     sql = <<EOS
 SELECT youtube_id
