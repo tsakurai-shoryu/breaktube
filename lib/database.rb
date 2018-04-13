@@ -24,7 +24,7 @@ class DataBase
 
   def playlists_count
     db = SQLite3::Database.new @dbenv
-    db.execute("SELECT COUNT(1) FROM playlists").flatten[0]
+    db.execute("SELECT COUNT(1) FROM playlists").flatten[0].to_i
   end
 
   def rand_pick(range: 0)
