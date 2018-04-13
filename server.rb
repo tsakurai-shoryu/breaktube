@@ -60,6 +60,8 @@ post '/' do
            )
 
   when /lastest/ then
+    p params[:text][/lastest(\d+)/,1].to_i
+    p db.playlists_count
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
     atta = [
