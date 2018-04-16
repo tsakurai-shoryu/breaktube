@@ -95,14 +95,13 @@ post '/' do
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
     return message_response("不正なIDです。") if y_id.nil?
     uname = params[:user_name]
-    if db.youtube_id_search?(y_id) and link_check?(y_id)
-      db.playlists_insert(user_name = uname, youtube_id = y_id)
-      slack_cl.chat_postMessage(channel: "breaktube-log", text: "#{params[:user_name]} added #{y_id}")
-      return message_response("ID追加に成功しました。")
-    else
-      return message_response("すでに存在するIDです。") unless db.youtube_id_search?(y_id)
-      return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
-    end
+
+    return message_response("すでに存在するIDです。") unless db.youtube_id_search?(y_id)
+    return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
+
+    db.playlists_insert(user_name = uname, youtube_id = y_id)
+    slack_cl.chat_postMessage(channel: "breaktube-log", text: "#{params[:user_name]} added #{y_id}")
+    return message_response("ID追加に成功しました。")
 
   when /help/ then
     return message_response(help)
