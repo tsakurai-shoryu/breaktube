@@ -24,9 +24,9 @@ Slack.configure do |config|
 end
 
 conns = []
-lastest_id = ""
+lastest_ids = []
 
-def picked(y_id, conns, lastest_id)
+def picked(y_id, conns, lastest_ids)
   atta = [
     {
       text: "ボタンを選択してください",
@@ -51,9 +51,9 @@ def picked(y_id, conns, lastest_id)
     }
   ]
   p atta
-  lastest_id = y_id
+  lastest_ids = [y_id]
   conns.each do |out|
-    params = { type: "select", videoid: lastest_id}
+    params = { type: "select", videoid: lastest_id[0]}
     out << "data: #{params.to_json}\n\n"
   end
   message_response(
@@ -70,7 +70,7 @@ get '/subscribe', provides: 'text/event-stream' do
   stream(:keep_open) do |out|
     conns << out
     if(lastest_id != "")
-      params = { type: "select", videoid: lastest_id}
+      params = { type: "select", videoid: lastest_ids[0]}
       out << "data: #{params.to_json}\n\n"
     end
     out.callback { conns.delete(out) }
