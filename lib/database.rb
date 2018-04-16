@@ -35,8 +35,8 @@ FROM(
   SELECT id, youtube_id
   FROM playlists
 EOS
-sql << "ORDER BY id DESC limit #{range}" if range != 0
-sql << ")"
+    sql << "ORDER BY id DESC limit #{range}" if range != 0
+    sql << ")"
     db.execute(sql).flatten.sample
   end
 
@@ -52,7 +52,7 @@ LIMIT 10
 EOS
     results = db.execute(sql)
     results.each.with_index(1) do |arr, index|
-    ranking << "#{index}位：#{arr[0]}  #{arr[1]}曲\n"
+      ranking << "#{index}位：#{arr[0]}  #{arr[1]}曲\n"
     end
     ranking
   end
