@@ -1,8 +1,11 @@
 require 'sinatra'
 require 'slack-ruby-client'
 require 'dotenv'
+require 'thin'
 require './lib/tools.rb'
 require './lib/database.rb'
+
+set server: "thin", connections: [], history_file: "history.yml"
 
 help =<<EOS
 breaktubeとは？
@@ -20,6 +23,60 @@ Slack.configure do |config|
   config.token = ENV["S_TOKEN"]
 end
 
+conns = []
+lastest_ids = []
+
+def picked(y_id, conns, lastest_ids)
+  atta = [
+    {
+      text: "ボタンを選択してください",
+      fallback: "評価を受け付けました",
+      callback_id: "review=#{y_id}",
+      color: "#3AA3E3",
+      attachment_type: "default",
+      actions: [
+        {
+          name: "vote",
+          text: "Up vote :+1:",
+          type: "button",
+          value: "upvote"
+        },
+        {
+          name: "vote",
+          text: "Down vote :-1:",
+          type: "button",
+          value: "downvote"
+        }
+      ]
+    }
+  ]
+  p atta
+  lastest_ids = [y_id]
+  conns.each do |out|
+    params = { type: "select", videoid: lastest_id[0]}
+    out << "data: #{params.to_json}\n\n"
+  end
+  message_response(
+           "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
+           attachments: atta
+         )
+end
+
+get '/' do
+  erb :index
+end
+
+get '/subscribe', provides: 'text/event-stream' do
+  stream(:keep_open) do |out|
+    conns << out
+    if(lastest_id != "")
+      params = { type: "select", videoid: lastest_ids[0]}
+      out << "data: #{params.to_json}\n\n"
+    end
+    out.callback { conns.delete(out) }
+  end
+end
+
 post '/' do
   content_type :json
   p params
@@ -30,66 +87,12 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
-    atta = [
-      {
-        text: "ボタンを選択してください",
-        fallback: "評価を受け付けました",
-        callback_id: "review=#{y_id}",
-        color: "#3AA3E3",
-        attachment_type: "default",
-        actions: [
-          {
-            name: "vote",
-            text: "Up vote :+1:",
-            type: "button",
-            value: "upvote"
-          },
-          {
-            name: "vote",
-            text: "Down vote :-1:",
-            type: "button",
-            value: "downvote"
-          }
-        ]
-      }
-    ]
-    p atta
-    return message_response(
-             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
-             attachments: atta
-           )
+    return picked(y_id, conns, lastest_id)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
-    atta = [
-      {
-        text: "ボタンを選択してください",
-        fallback: "評価を受け付けました",
-        callback_id: "review=#{y_id}",
-        color: "#3AA3E3",
-        attachment_type: "default",
-        actions: [
-          {
-            name: "vote",
-            text: "Up vote :+1:",
-            type: "button",
-            value: "upvote"
-          },
-          {
-            name: "vote",
-            text: "Down vote :-1:",
-            type: "button",
-            value: "downvote"
-          }
-        ]
-      }
-    ]
-    p atta
-    return message_response(
-             "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
-             attachments: atta
-           )
+    return picked(y_id, conns, lastest_id)
 
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
@@ -133,4 +136,14 @@ post '/results' do
     "不正な値です。bot管理者に連絡してください。"
   end
   ""
+end
+
+Thread.new do
+  loop do
+    sleep 15
+    conns.each do |out|
+      params = { type: "count", count: conns.count}
+      out << "data: #{params.to_json}\n\n"
+    end
+  end
 end
