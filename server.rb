@@ -53,7 +53,7 @@ def picked(y_id, conns, lastest_ids)
   p atta
   lastest_ids = [y_id]
   conns.each do |out|
-    params = { type: "select", videoid: lastest_id[0]}
+    params = { type: "select", videoid: lastest_ids[0]}
     out << "data: #{params.to_json}\n\n"
   end
   message_response(
@@ -87,12 +87,12 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
-    return picked(y_id, conns, lastest_id)
+    return picked(y_id, conns, lastest_ids)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
-    return picked(y_id, conns, lastest_id)
+    return picked(y_id, conns, lastest_ids)
 
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
