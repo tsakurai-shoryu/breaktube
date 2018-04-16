@@ -23,7 +23,7 @@ Slack.configure do |config|
   config.token = ENV["S_TOKEN"]
 end
 
-def picked
+def picked(y_id)
   atta = [
     {
       text: "ボタンを選択してください",
