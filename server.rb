@@ -69,7 +69,7 @@ end
 get '/subscribe', provides: 'text/event-stream' do
   stream(:keep_open) do |out|
     conns << out
-    if(lastest_id != "")
+    if(lastest_ids[0] != "")
       params = { type: "select", videoid: lastest_ids[0]}
       out << "data: #{params.to_json}\n\n"
     end
