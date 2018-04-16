@@ -23,6 +23,9 @@ Slack.configure do |config|
   config.token = ENV["S_TOKEN"]
 end
 
+conns = []
+lastest_id = ""
+
 def picked(y_id)
   atta = [
     {
@@ -58,9 +61,6 @@ def picked(y_id)
            attachments: atta
          )
 end
-
-conns = []
-lastest_id = ""
 
 get '/' do
   erb :index
