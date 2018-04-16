@@ -39,4 +39,21 @@ sql << "ORDER BY id DESC limit #{range}" if range != 0
 sql << ")"
     db.execute(sql).flatten.sample
   end
+
+  def ranking_pick
+    db = SQLite3::Database.new @dbenv
+    ranking = "breaktube曲追加ランキング\n"
+    sql = <<EOS
+SELECT user_name, COUNT(1) AS value
+FROM playlists
+GROUP BY user_name
+ORDER BY value DESC
+LIMIT 10
+EOS
+    results = db.execute(sql)
+    results.each.with_index(1) do |arr, index|
+    ranking << "#{index}位：#{arr[0]}  #{arr[1]}曲\n"
+    end
+    ranking
+  end
 end
