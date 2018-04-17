@@ -39,12 +39,15 @@
           var params = JSON.parse(event.data);
           switch(params.type) {
             case "count":
-                cu.innerText = params.count;
-                  break;
+              cu.innerText = params.count;
+              break;
             case "select":
               if(player.getVideoData().video_id != params.videoid) {
                 player.loadVideoById(params.videoid);
               }
+              break;
+            case "force":
+              nextVideo();
               break;
             }
         });
@@ -55,19 +58,22 @@
 
         console.log(status);
         if ( status == '0') {
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
-          xhr.onreadystatechange = function() {
-            if(xhr.readyState === 4 && xhr.status === 200) {
-              console.log(xhr.responseText);
-              if(xhr.responseText !== "") {
-                player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
-              }
-              player.playVideoAt();
-            }
-          }
-          xhr.send();
+          nextVideo();
         }
+      }
+      function nextVideo() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState === 4 && xhr.status === 200) {
+            console.log(xhr.responseText);
+            if(xhr.responseText !== "") {
+              player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
+            }
+            player.playVideoAt();
+          }
+        }
+        xhr.send();
       }
       function stopVideo() {
         player.stopVideo();
