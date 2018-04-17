@@ -47,7 +47,7 @@
               }
               break;
             case "force":
-              stopVideo();
+              nextVideo();
               break;
             }
         });
@@ -58,19 +58,22 @@
 
         console.log(status);
         if ( status == '0') {
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
-          xhr.onreadystatechange = function() {
-            if(xhr.readyState === 4 && xhr.status === 200) {
-              console.log(xhr.responseText);
-              if(xhr.responseText !== "") {
-                player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
-              }
-              player.playVideoAt();
-            }
-          }
-          xhr.send();
+          nextVideo();
         }
+      }
+      fucntion nextVideo() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
+        xhr.onreadystatechange = function() {
+          if(xhr.readyState === 4 && xhr.status === 200) {
+            console.log(xhr.responseText);
+            if(xhr.responseText !== "") {
+              player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
+            }
+            player.playVideoAt();
+          }
+        }
+        xhr.send();
       }
       function stopVideo() {
         player.stopVideo();
