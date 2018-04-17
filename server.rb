@@ -125,6 +125,7 @@ post '/' do
       params = { type: "force" }
       out << "data: #{params.to_json}\n\n"
     end
+    return message_response("強制的に切り替えたよ。")
   when /count/ then
     return message_response(db.playlists_count)
 
