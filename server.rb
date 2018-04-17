@@ -71,6 +71,7 @@ end
 get '/next' do
   finished_id = params[:videoid]
   queue.shift if queue.first == finished_id
+  queue << db.rand_pick if queue.empty?
   videoid = queue.first
 end
 
