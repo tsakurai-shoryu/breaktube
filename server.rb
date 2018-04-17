@@ -69,6 +69,7 @@ get '/' do
 end
 
 get '/next' do
+  db = DataBase.new
   finished_id = params[:videoid]
   queue.shift if queue.first == finished_id
   queue << db.rand_pick if queue.empty?
