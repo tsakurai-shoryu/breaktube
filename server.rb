@@ -26,7 +26,7 @@ end
 conns = []
 lastest_ids = []
 
-def picked(y_id, conns, lastest_ids)
+def picked(y_id, conns, lastest_ids, channel)
   atta = [
     {
       text: "ボタンを選択してください",
@@ -51,10 +51,12 @@ def picked(y_id, conns, lastest_ids)
     }
   ]
   p atta
-  lastest_ids = [y_id]
-  conns.each do |out|
-    params = { type: "select", videoid: lastest_ids[0]}
-    out << "data: #{params.to_json}\n\n"
+  if channel == "breaktube"
+    lastest_ids = [y_id]
+    conns.each do |out|
+      params = { type: "select", videoid: lastest_ids[0]}
+      out << "data: #{params.to_json}\n\n"
+    end
   end
   message_response(
            "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
@@ -87,12 +89,13 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
-    return picked(y_id, conns, lastest_ids)
+    channnel = params[:channel_name]
+    return picked(y_id, conns, lastest_ids, channel)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
-    return picked(y_id, conns, lastest_ids)
+    return picked(y_id, conns, lastest_ids, channel)
 
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
