@@ -95,7 +95,7 @@ post '/' do
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
-    return picked(y_id, conns, lastest_ids)
+    return picked(y_id, conns, lastest_ids, channel)
 
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
