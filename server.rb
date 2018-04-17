@@ -120,7 +120,11 @@ post '/' do
 
   when /help/ then
     return message_response(help)
-
+  when /force/ then
+    conns.each do |out|
+      params = { type: "force" }
+      out << "data: #{params.to_json}\n\n"
+    end
   when /count/ then
     return message_response(db.playlists_count)
 
