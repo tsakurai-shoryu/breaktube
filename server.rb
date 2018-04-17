@@ -24,9 +24,9 @@ Slack.configure do |config|
 end
 
 conns = []
-lastest_ids = []
+queue = []
 
-def picked(y_id, conns, lastest_ids, channel)
+def picked(y_id, conns, queue, channel)
   atta = [
     {
       text: "ボタンを選択してください",
@@ -52,9 +52,9 @@ def picked(y_id, conns, lastest_ids, channel)
   ]
   p atta
   if channel == "breaktube"
-    lastest_ids = [y_id]
+    queue << y_id
     conns.each do |out|
-      params = { type: "select", videoid: lastest_ids[0]}
+      params = { type: "select", videoid: queue.first}
       out << "data: #{params.to_json}\n\n"
     end
   end
@@ -68,11 +68,19 @@ get '/' do
   erb :index
 end
 
+get '/next' do
+  db = DataBase.new
+  finished_id = params[:videoid]
+  queue.shift if queue.first == finished_id
+  queue << db.rand_pick if queue.empty?
+  videoid = queue.first
+end
+
 get '/subscribe', provides: 'text/event-stream' do
   stream(:keep_open) do |out|
     conns << out
-    if(lastest_ids[0] != "")
-      params = { type: "select", videoid: lastest_ids[0]}
+    unless(queue.empty?)
+      params = { type: "select", videoid: queue.first}
       out << "data: #{params.to_json}\n\n"
     end
     out.callback { conns.delete(out) }
@@ -90,13 +98,13 @@ post '/' do
   when "" then
     y_id = db.rand_pick
     channel = params[:channel_name]
-    return picked(y_id, conns, lastest_ids, channel)
+    return picked(y_id, conns, queue, channel)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
     channel = params[:channel_name]
-    return picked(y_id, conns, lastest_ids, channel)
+    return picked(y_id, conns, queue, channel)
 
   when /add=/ then
     y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
