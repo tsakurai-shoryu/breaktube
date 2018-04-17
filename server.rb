@@ -89,12 +89,13 @@ post '/' do
 
   when "" then
     y_id = db.rand_pick
-    channnel = params[:channel_name]
+    channel = params[:channel_name]
     return picked(y_id, conns, lastest_ids, channel)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
+    channel = params[:channel_name]
     return picked(y_id, conns, lastest_ids, channel)
 
   when /add=/ then
