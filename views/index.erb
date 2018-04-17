@@ -39,8 +39,8 @@
           var params = JSON.parse(event.data);
           switch(params.type) {
             case "count":
-                cu.innerText = params.count;
-                  break;
+              cu.innerText = params.count;
+              break;
             case "select":
               if(player.getVideoData().video_id != params.videoid) {
                 player.loadVideoById(params.videoid);
@@ -61,7 +61,7 @@
           nextVideo();
         }
       }
-      fucntion nextVideo() {
+      function nextVideo() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
         xhr.onreadystatechange = function() {
