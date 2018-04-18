@@ -71,9 +71,23 @@ end
 get '/next' do
   db = DataBase.new
   finished_id = params[:videoid]
-  queue.shift if queue.first == finished_id
+  first_switcher = queue.first == finished_id
+  if first_switcher
+    queue.shift
+    message_response("視聴者数 >>> #{conn.count}") 
+    message_response("キュー >>> #{queue.count}") 
+  end
   queue << db.rand_pick if queue.empty?
   videoid = queue.first
+  if first_switcher
+    message_response("#{videoid} を再生します") 
+    if queue.empty?
+      message_response("キューが空だよ!!")
+    else
+      message_response("その後は #{queue.first} ね")
+    end
+  end
+  videoid
 end
 
 get '/subscribe', provides: 'text/event-stream' do
