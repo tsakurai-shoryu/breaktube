@@ -12,10 +12,7 @@ EOS
 
 module App
   class Base < ::Sinatra::Base
-    conns = []
-    queue = []
-
-    def picked(y_id, conns, queue, channel)
+    def picked(y_id, channel)
       atta = [
         {
           text: "ボタンを選択してください",
@@ -41,11 +38,7 @@ module App
       ]
       p atta
       if channel == "breaktube" or channel == "breaktube-log"
-        queue << y_id
-        conns.each do |out|
-          params = { type: "select", videoid: queue.first}
-          out << "data: #{params.to_json}\n\n"
-        end
+        Stream.add_queue(y_id)
       end
       message_response(
               "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
@@ -54,36 +47,13 @@ module App
     end
 
     get '/next' do
-      db = DataBase.new
-      finished_id = params[:videoid]
-      first_switcher = queue.first == finished_id
-      if first_switcher
-        queue.shift
-        notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
-        if queue.empty?
-          queue << db.rand_pick
-          notification_text = "次のキューが空なのでこれを再生するよ!!"
-        else
-          notification_text = "次はこの曲を再生するよ!!"
-          notification_text << "その次のキューが空だよ!!" if queue.count == 1
-        end
-        post_stream_notify(notification_text, notification_status, queue[0])
-        if queue.count >= 2
-          notification_text = "その次はこの曲を再生する予定だよ!!"
-          post_stream_notify(notification_text, "", queue[1])
-        end
-      end
-      queue.first
+      Stream.finish(params[:videoid])
+      videoid = Stream.select_next
     end
 
     get '/subscribe', provides: 'text/event-stream' do
       stream(:keep_open) do |out|
-        conns << out
-        unless(queue.empty?)
-          params = { type: "select", videoid: queue.first}
-          out << "data: #{params.to_json}\n\n"
-        end
-        out.callback { conns.delete(out) }
+        Stream.add_connection(out)
       end
     end
 
@@ -98,7 +68,7 @@ module App
       when "" then
         y_id = db.rand_pick
         channel = params[:channel_name]
-        return picked(y_id, conns, queue, channel)
+        return picked(y_id, channel)
 
 
       when "user_ranking" then
@@ -109,7 +79,7 @@ module App
         sample_count = [params[:text][/las?test(\d+)/,1].to_i, db.playlists_count].min
         y_id = db.rand_pick(range: sample_count)
         channel = params[:channel_name]
-        return picked(y_id, conns, queue, channel)
+        return picked(y_id, channel)
 
       when /add=/ then
         y_id = params[:text][/add=(https:\/\/www.youtube.com\/watch\?v=|https:\/\/youtu.be\/|)([a-zA-Z0-9_\-]+)/,2]
@@ -134,10 +104,7 @@ module App
         if params[:channel_name] != "breaktube"
           return message_response("このチャンネルでは利用できないコマンドです。")
         end
-        conns.each do |out|
-          params = { type: "force" }
-          out << "data: #{params.to_json}\n\n"
-        end
+        Stream.force_next
         return message_response("強制的に切り替えたよ。")
 
       when /count/ then
@@ -167,16 +134,6 @@ module App
         "不正な値です。bot管理者に連絡してください。"
       end
       ""
-    end
-
-    Thread.new do
-      loop do
-        sleep 15
-        conns.each do |out|
-          params = { type: "count", count: conns.count}
-          out << "data: #{params.to_json}\n\n"
-        end
-      end
     end
   end
 end
