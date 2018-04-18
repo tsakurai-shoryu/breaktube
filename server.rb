@@ -2,6 +2,7 @@ require 'sinatra'
 require 'slack-ruby-client'
 require 'dotenv'
 require 'thin'
+require 'haml'
 require './lib/tools.rb'
 require './lib/database.rb'
 
@@ -66,7 +67,7 @@ def picked(y_id, conns, queue, channel)
 end
 
 get '/' do
-  erb :index
+  haml :index
 end
 
 get '/next' do
