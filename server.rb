@@ -90,7 +90,7 @@ get '/next' do
   end
   unless notifications.empty?
     slack_cl = Slack::Web::Client.new
-    slack_cl.chat_postMessage(channel: "breaktube", text: "#{notifications.join('\n')}")
+    slack_cl.chat_postMessage(channel: "breaktube", text: "#{notifications.join("\n")}")
   end
   videoid
 end
