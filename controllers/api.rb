@@ -175,12 +175,12 @@ module App
 
     get '/grid' do
       @list = DataBase.new.all
-      erb :grid
+      haml :grid
     end
 
     get '/list' do
       @list = DataBase.new.all
-      erb :list
+      haml :list
     end
 
     Thread.new do

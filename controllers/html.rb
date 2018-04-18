@@ -1,7 +1,7 @@
 module App
   class Base < ::Sinatra::Base
     get '/' do
-      erb :index
+      haml :index
     end
   end
 end
