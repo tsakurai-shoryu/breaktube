@@ -1,0 +1,11 @@
+version: '2'
+services:
+  app:
+    container_name: "breaktube"
+    build: .
+    ports:
+      - "4567:4567"
+    volumes:
+      -  "./db:/app/db"
+    environment:
+      DB_PATH: '/app/db/breaktube-dev.db'
