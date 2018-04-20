@@ -82,7 +82,7 @@ get '/next' do
       notifications << "次のキューが空なので #{queue[0]} 再生するよ!!"
     else
       notifications << "#{queue[0]} を再生します"
-      notifications << "その後は #{queue[1]} ね"
+      queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は #{queue[1]} ね"
     end
     slack_cl = Slack::Web::Client.new
     slack_cl.chat_postMessage(channel: "breaktube", text: notifications.join("\n"))
