@@ -54,8 +54,8 @@ EOS
     results.each_cons(2) do |(l,r)|
       r[2] = l[2] if l[1] == r[1]
     end
-    results.each do |ar|
-      ranking << "#{ar[2]}位：#{arr[0]}  #{arr[1]}曲\n"
+    results.each do |arr|
+      ranking << "#{arr[2]}位：#{arr[0]}  #{arr[1]}曲\n"
     end
     ranking
   end
