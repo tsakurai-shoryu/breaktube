@@ -75,10 +75,11 @@ get '/next' do
   notifications = []
   if first_switcher
     queue.shift
+    queue << db.rand_pick if queue.empty?
     notifications << "視聴者数 >>> #{conns.count}"
-    notifications << "キュー >>> #{queue.count}"
+    notifications << "キュー >>> #{queue.count-1}"
   end
-  queue << db.rand_pick if queue.empty?
+
   videoid = queue.first
   if first_switcher
     notifications << "#{videoid} を再生します"
