@@ -72,9 +72,23 @@ end
 get '/next' do
   db = DataBase.new
   finished_id = params[:videoid]
-  queue.shift if queue.first == finished_id
-  queue << db.rand_pick if queue.empty?
-  videoid = queue.first
+  first_switcher = queue.first == finished_id
+  notifications = []
+  if first_switcher
+    notifications << "視聴者数 >>> #{conns.count}"
+    queue.shift
+    notifications << "キュー >>> #{queue.count}"
+    if queue.empty?
+      queue << db.rand_pick
+      notifications << "次のキューが空なので #{queue[0]} 再生するよ!!"
+    else
+      notifications << "#{queue[0]} を再生します"
+      queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は #{queue[1]} ね"
+    end
+    slack_cl = Slack::Web::Client.new
+    slack_cl.chat_postMessage(channel: "breaktube", text: notifications.join("\n"))
+  end
+  queue.first
 end
 
 get '/subscribe', provides: 'text/event-stream' do
