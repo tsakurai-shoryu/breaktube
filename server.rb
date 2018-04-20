@@ -15,6 +15,7 @@ breaktubeとは？
 `/breaktube lastest10` => 最新追加10曲からランダムに再生。数字部分は変更可能。
 `/breaktube add=ID` => 動画のリンクをadd=の後ろに入力するとbreaktubeに動画を追加。
 `/breaktube count` => 今breaktubeに登録されている曲数がわかる。
+`/breaktube user_ranking` => breaktubeに曲を登録した数のランキングTOP10が確認できます。
 EOS
 
 Dotenv.load
@@ -99,6 +100,10 @@ post '/' do
     y_id = db.rand_pick
     channel = params[:channel_name]
     return picked(y_id, conns, queue, channel)
+
+
+  when "user_ranking" then
+    return message_response(db.ranking_pick)
 
   when /lastest/ then
     sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min

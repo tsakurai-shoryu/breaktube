@@ -35,8 +35,28 @@ FROM(
   SELECT id, youtube_id
   FROM playlists
 EOS
-sql << "ORDER BY id DESC limit #{range}" if range != 0
-sql << ")"
+    sql << "ORDER BY id DESC limit #{range}" if range != 0
+    sql << ")"
     db.execute(sql).flatten.sample
+  end
+
+  def ranking_pick
+    db = SQLite3::Database.new @dbenv
+    ranking = "breaktube曲追加ランキング\n"
+    sql = <<EOS
+SELECT user_name, COUNT(1) AS value
+FROM playlists
+GROUP BY user_name
+ORDER BY value DESC
+EOS
+    results = db.execute(sql)
+    results.each.with_index(1) {|ar, index| ar << index}
+    results.each_cons(2) do |(l,r)|
+      r[2] = l[2] if l[1] == r[1]
+    end
+    results.each do |arr|
+      ranking << "#{arr[2]}位：#{arr[0]}  #{arr[1]}曲\n"
+    end
+    ranking
   end
 end
