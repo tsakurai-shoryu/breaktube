@@ -82,10 +82,10 @@ get '/next' do
   videoid = queue.first
   if first_switcher
     notifications << "#{videoid} を再生します"
-    if queue.empty?
-      notufy_message << "キューが空だよ!!"
+    if queue.size == 1
+      notufy_message << "次のキューが空だよ!!"
     else
-      notifications << "その後は #{queue.first} ね" 
+      notifications << "その後は #{queue[1]} ね"
     end
   end
   unless notifications.empty?
