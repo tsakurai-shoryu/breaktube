@@ -80,7 +80,7 @@ get '/next' do
     notifications << "キュー >>> #{queue.count}"
     if queue.empty?
       queue << db.rand_pick
-      notifications << "次のキューが空なので #{get_title(queue[0])} 再生するよ!!"
+      notifications << "次のキューが空なので\n #{get_title(queue[0])} \nを再生するよ!!"
     else
       notifications << "#{get_title(queue[0])} を再生します"
       queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は #{get_title(queue[1])} ね"
