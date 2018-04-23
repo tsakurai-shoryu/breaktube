@@ -73,23 +73,22 @@ get '/next' do
   db = DataBase.new
   finished_id = params[:videoid]
   first_switcher = queue.first == finished_id
-  notifications = []
+  notifications = {}
   if first_switcher
-    notifications << "視聴者数 >>> #{conns.count}"
     queue.shift
-    notifications << "キュー >>> #{queue.count}"
+    notifications["status"] = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
       queue << db.rand_pick
-      notifications << "次のキューが空なので"
-      notifications << "<https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}>"
-      notifications << "を再生するよ!!"
+      notifications["text"] = "次のキューが空なのでこれを再生するよ!!"
     else
-      notifications << "<https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}>"
-      notifications << "を再生します"
-      queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は\n <https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}> \nだよ!!"
+      notifications["text"] = "次はこの曲を再生するよ!!"
+      notifications["text"] << "次のキューが空だよ!!" if queue.count == 1
     end
-    slack_cl = Slack::Web::Client.new
-    slack_cl.chat_postMessage(channel: "breaktube", text: notifications.join("\n"))
+    post_stream_notify(notifications, queue[0])
+    if queue.count >= 2
+      notifications["text"] = "次はこの曲を再生する予定だよ!!"
+      post_stream_notify(notifications, queue[1], status=false)
+    end
   end
   queue.first
 end
