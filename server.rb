@@ -85,7 +85,7 @@ get '/next' do
     end
     post_stream_notify(notification_text, notification_status, queue[0])
     if queue.count >= 2
-      notification_text = "次はこの曲を再生する予定だよ!!"
+      notification_text = "その次はこの曲を再生する予定だよ!!"
       post_stream_notify(notification_text, "", queue[1])
     end
   end
