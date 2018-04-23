@@ -73,21 +73,20 @@ get '/next' do
   db = DataBase.new
   finished_id = params[:videoid]
   first_switcher = queue.first == finished_id
-  notifications = {}
   if first_switcher
     queue.shift
-    notifications["status"] = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
+    notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
       queue << db.rand_pick
-      notifications["text"] = "次のキューが空なのでこれを再生するよ!!"
+      notification_text = "次のキューが空なのでこれを再生するよ!!"
     else
-      notifications["text"] = "次はこの曲を再生するよ!!"
-      notifications["text"] << "次のキューが空だよ!!" if queue.count == 1
+      notification_text = "次はこの曲を再生するよ!!"
+      notification_text << "その次のキューが空だよ!!" if queue.count == 1
     end
-    post_stream_notify(notifications, queue[0])
+    post_stream_notify(notification_text, notification_status, queue[0])
     if queue.count >= 2
-      notifications["text"] = "次はこの曲を再生する予定だよ!!"
-      post_stream_notify(notifications, queue[1], status=false)
+      notification_text = "次はこの曲を再生する予定だよ!!"
+      post_stream_notify(notification_text, "", queue[1])
     end
   end
   queue.first

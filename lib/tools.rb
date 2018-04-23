@@ -28,15 +28,15 @@ def get_title(youtube_id)
   result["items"][0]["snippet"]["title"]
 end
 
-def post_stream_notify(notifications, youtube_id, status: true)
+def post_stream_notify(notification_text, notification_status, youtube_id)
   atta = [
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "#36a64f",
-      "pretext": notifications["text"],
+      "pretext": notification_text,
       "title": get_title(youtube_id),
       "title_link": "https://www.youtube.com/watch?v=#{youtube_id}",
-      "text": status ? notifications["status"] : "",
+      "text": notification_status,
       "thumb_url": "http://i.ytimg.com/vi/#{youtube_id}/default.jpg"
     }
   ].to_json
