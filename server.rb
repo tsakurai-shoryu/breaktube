@@ -80,10 +80,13 @@ get '/next' do
     notifications << "キュー >>> #{queue.count}"
     if queue.empty?
       queue << db.rand_pick
-      notifications << "次のキューが空なので\n #{get_title(queue[0])} \nを再生するよ!!"
+      notifications << "次のキューが空なので"
+      notifications << "<https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}>"
+      notifications << "を再生するよ!!"
     else
-      notifications << "#{get_title(queue[0])} を再生します"
-      queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は #{get_title(queue[1])} ね"
+      notifications << "<https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}>"
+      notifications << "を再生します"
+      queue.count == 1 ? notifications << "次のキューが空だよ!!" : "その後は\n <https://www.youtube.com/watch?v=#{queue[0]}|#{get_title(queue[0])}> \nだよ!!"
     end
     slack_cl = Slack::Web::Client.new
     slack_cl.chat_postMessage(channel: "breaktube", text: notifications.join("\n"))
