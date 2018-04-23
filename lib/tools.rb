@@ -21,3 +21,9 @@ def link_check?(youtube_id)
   result = JSON.parse(Net::HTTP.get(uri))
   result["items"].size > 0
 end
+
+def get_title(youtube_id)
+  uri = URI.parse("https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id}&key=#{ENV["Y_APIKEY"]}&part=snippet")
+  result = JSON.parse(Net::HTTP.get(uri))
+  result["items"][0]["snippet"]["title"]
+end
