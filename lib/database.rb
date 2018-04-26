@@ -7,7 +7,7 @@ class DataBase
 
   def youtube_id_search?(youtube_id)
     db = SQLite3::Database.new @dbenv
-    db.execute("SELECT youtube_id FROM playlists WHERE youtube_id = \"#{youtube_id}\"").empty?
+    db.execute("SELECT youtube_id FROM playlists WHERE youtube_id = \"#{youtube_id}\"").empty?.!
   end
 
   def playlist_id_search(youtube_id)
