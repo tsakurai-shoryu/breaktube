@@ -52,7 +52,7 @@ def picked(y_id, conns, queue, channel)
     }
   ]
   p atta
-  if channel == "breaktube"
+  if channel == "breaktube" or channel == "breaktube-log"
     queue << y_id
     conns.each do |out|
       params = { type: "select", videoid: queue.first}
