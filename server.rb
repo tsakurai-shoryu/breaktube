@@ -120,8 +120,9 @@ post '/' do
   when "user_ranking" then
     return message_response(db.ranking_pick)
 
-  when /lastest/ then
-    sample_count = [params[:text][/lastest(\d+)/,1].to_i, db.playlists_count].min
+  # 'latest' or 'lastest'
+  when /las?test/ then
+    sample_count = [params[:text][/las?test(\d+)/,1].to_i, db.playlists_count].min
     y_id = db.rand_pick(range: sample_count)
     channel = params[:channel_name]
     return picked(y_id, conns, queue, channel)
