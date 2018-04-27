@@ -146,7 +146,7 @@ post '/' do
   when /help/ then
     return message_response(help)
 
-  when /force/ then
+  when "force" then
     if params[:channel_name] != "breaktube"
       return message_response("このチャンネルでは利用できないコマンドです。")
     end
