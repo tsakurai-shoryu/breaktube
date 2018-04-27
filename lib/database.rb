@@ -2,7 +2,7 @@ require 'sqlite3'
 
 class DataBase
   def initialize
-    @dbenv = "breaktube-prod.db"
+    @dbenv = ENV.fetch('DB_PATH', "breaktube-prod.db")
   end
 
   def youtube_id_search?(youtube_id)
