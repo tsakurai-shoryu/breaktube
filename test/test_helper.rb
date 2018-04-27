@@ -8,6 +8,10 @@ require 'rack/test'
 
 require_relative '../bootstrap'
 
+DB = Sequel.sqlite
+Sequel.extension :migration
+Sequel::Migrator.run(DB, './db/migrations/', use_transactions: true)
+
 class TestHelper < MiniTest::Test
   include Rack::Test::Methods
 

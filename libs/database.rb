@@ -1,73 +1,52 @@
-require 'sqlite3'
-
 class DataBase
-  def initialize
-    @dbenv = ENV.fetch('DB_PATH', "breaktube-prod.db")
-  end
-
   def youtube_id_search?(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("SELECT youtube_id FROM playlists WHERE youtube_id = \"#{youtube_id}\"").empty?.!
+    playlists = DB[:playlists]
+    playlists.where(youtube_id: youtube_id).empty?.!
   end
 
+  # obsoleted
   def playlist_id_search(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("SELECT id FROM playlists WHERE youtube_id = \"#{youtube_id}\"")
+    # db = SQLite3::Database.new @dbenv
+    # db.execute("SELECT id FROM playlists WHERE youtube_id = \"#{youtube_id}\"")
   end
 
   def playlists_insert(user_name,youtube_id)
     c_at = Time.now.to_i
     title_name = check_title(youtube_id)
     playback_time = check_video_seconds(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("INSERT INTO playlists (user_name, youtube_id, title_name, playback_time, created_at) VALUES (?, ?, ?, ?, ?)",
-               [user_name, youtube_id, title_name, playback_time, c_at])
+    DB[:playlists].insert(user_name: user_name, youtube_id: youtube_id, title_name: title_name, playback_time: playback_time, created_at: c_at)
   end
 
   def finishlists_insert(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("INSERT INTO finishlists (youtube_id) VALUES (?)",
-               [youtube_id])
+    DB[:finishlists].insert(youtube_id: youtube_id)
   end
 
   def playlists_count
-    db = SQLite3::Database.new @dbenv
-    db.execute("SELECT COUNT(1) FROM playlists").flatten[0].to_i
+    DB[:playlists].count
   end
 
   def get_title(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("SELECT title_name FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0]
+    DB[:playlists].where(youtube_id: youtube_id).first[:title_name]
   end
 
   def get_video_seconds(youtube_id)
-    db = SQLite3::Database.new @dbenv
-    db.execute("SELECT playback_time FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0].to_i
+    DB[:playlists].where(youtube_id: youtube_id).first[:playback_time].to_i
   end
 
   def rand_pick(range: 0)
-    db = SQLite3::Database.new @dbenv
-    sql = <<EOS
-SELECT youtube_id
-FROM(
-  SELECT id, youtube_id
-  FROM playlists
-EOS
-    sql << "ORDER BY id DESC limit #{range}" if range != 0
-    sql << ")"
-    db.execute(sql).flatten.sample
+    sql = DB[:playlists].reverse_order(:id)
+    sql = sql.limit(range) if range != 0
+    sql.map(:youtube_id).sample
   end
 
   def short_video_pick
-    db = SQLite3::Database.new @dbenv
-    finished = db.execute("SELECT youtube_id FROM finishlists").flatten.join('","')
-    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 AND youtube_id not in (\"#{finished}\")").flatten.sample
-    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample if y_id.nil?
+    finished = DB[:finishlists].map(:youtube_id)
+    y_id = DB[:playlists].where{playback_time <= 600}.exclude(youtube_id: finished).map(:youtube_id).sample
+    y_id = DB[:playlists].where{playback_time <= 600}.map(:youtube_id).sample if y_id.nil?
     y_id
   end
 
   def ranking_pick
-    db = SQLite3::Database.new @dbenv
     ranking = "breaktube曲追加ランキング\n"
     sql = <<EOS
 SELECT user_name, COUNT(1) AS value
@@ -75,8 +54,10 @@ FROM playlists
 GROUP BY user_name
 ORDER BY value DESC
 EOS
-    results = db.execute(sql)
-    results.each.with_index(1) {|ar, index| ar << index}
+    results = DB[sql].map{ |row| row.values }
+    results.each.with_index(1) do |ar, index|
+      ar << index
+    end
     results.each_cons(2) do |(l,r)|
       r[2] = l[2] if l[1] == r[1]
     end
@@ -86,15 +67,15 @@ EOS
     ranking
   end
 
+  # obsoleted
   def list(page)
-    db = SQLite3::Database.new @dbenv
-    limit = 50 # マジックナンバーである
-    offset = page * limit
-    db.execute("select youtube_id, user_name, title_name from playlists order by id desc limit #{limit} offset #{offset}")
+    # db = SQLite3::Database.new @dbenv
+    # limit = 50 # マジックナンバーである
+    # offset = page * limit
+    # db.execute("select youtube_id, user_name, title_name from playlists order by id desc limit #{limit} offset #{offset}")
   end
 
   def all
-    db = SQLite3::Database.new @dbenv
-    db.execute("select youtube_id, user_name, title_name from playlists order by id desc")
+    DB[:playlists].select(:youtube_id, :user_name, :title_name).reverse_order(:id).map{ |s| s.values }
   end
 end
