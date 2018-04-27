@@ -2,3 +2,4 @@
 *.db
 /vendor/
 /.bundle/
+docker-compose.yml

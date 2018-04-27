@@ -9,3 +9,5 @@ services:
       -  "./db:/app/db"
     environment:
       DB_PATH: '/app/db/breaktube-dev.db'
+      Y_APIKEY: ''
+      S_TOKEN: ''
