@@ -53,7 +53,7 @@ def picked(y_id, conns, queue, channel)
   ]
   p atta
   if channel == "breaktube" or channel == "breaktube-log"
-    queue << y_id
+    queue << y_id ? get_video_seconds(y_id) <= 600
     conns.each do |out|
       params = { type: "select", videoid: queue.first}
       out << "data: #{params.to_json}\n\n"
@@ -133,7 +133,7 @@ post '/' do
     uname = params[:user_name]
 
     if db.youtube_id_search?(y_id)
-      queue << y_id
+      queue << y_id ? get_video_seconds(y_id) <= 600
       return message_response("すでに存在するIDです。")
     end
     return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
