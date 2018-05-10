@@ -53,7 +53,7 @@ def picked(y_id, conns, queue, channel)
   ]
   p atta
   if channel == "breaktube" or channel == "breaktube-log"
-    y_id.short_video_pick!
+    y_id = short_video_pick(y_id)
     queue << y_id
     conns.each do |out|
       params = { type: "select", videoid: queue.first}
@@ -66,14 +66,13 @@ def picked(y_id, conns, queue, channel)
          )
 end
 
-def short_video_pick!
-  y_id = self
+def short_video_pick(y_id)
   video_time = get_video_seconds(y_id)
   while video_time > 600 do
     y_id = db.rand_pick
     video_time = get_video_seconds(y_id)
   end
-  self.replace(y_id)
+  y_id
 end
 
 get '/' do
