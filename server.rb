@@ -53,7 +53,7 @@ def picked(y_id, conns, queue, channel)
   ]
   p atta
   if channel == "breaktube" or channel == "breaktube-log"
-    y_id.short_vieo_pick!
+    y_id.short_video_pick!
     queue << y_id
     conns.each do |out|
       params = { type: "select", videoid: queue.first}
