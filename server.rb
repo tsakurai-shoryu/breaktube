@@ -143,7 +143,7 @@ post '/' do
     uname = params[:user_name]
 
     if db.youtube_id_search?(y_id)
-      queue << y_id.short_video_pick!
+      queue << y_id if get_video_seconds(y_id) <= 600
       return message_response("すでに存在するIDです。")
     end
     return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
