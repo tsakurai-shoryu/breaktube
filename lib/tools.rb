@@ -28,6 +28,22 @@ def get_title(youtube_id)
   result["items"][0]["snippet"]["title"]
 end
 
+def get_video_seconds(youtube_id)
+  uri = URI.parse("https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id}&key=#{ENV["Y_APIKEY"]}&part=contentDetails")
+  result = JSON.parse(Net::HTTP.get(uri))
+  video_time = result["items"][0]["contentDetails"]["duration"].delete("PT").gsub(/(\d+?[A-Z])/,'\0 ').split
+  video_time.map! do |s|
+    if s.include?("H")
+      s.delete("H").to_i*3600
+    elsif s.include?("M")
+      s.delete("M").to_i*60
+    else
+      s.delete("S").to_i
+    end
+  end
+  video_time.sum
+end
+
 def post_stream_notify(notification_text, notification_status, youtube_id)
   atta = [
     {
