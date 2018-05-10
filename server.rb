@@ -87,7 +87,7 @@ get '/next' do
     queue.shift
     notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
-      queue << db.rand_pick.short_video_pick!
+      queue << short_video_pick(db.rand_pick)
       notification_text = "次のキューが空なのでこれを再生するよ!!"
     else
       notification_text = "次はこの曲を再生するよ!!"
