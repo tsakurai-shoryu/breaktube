@@ -101,6 +101,7 @@ get '/next' do
       post_stream_notify(notification_text, "", queue[1])
     end
   end
+  p queue
   queue.first
 end
 
