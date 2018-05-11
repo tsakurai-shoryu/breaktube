@@ -67,7 +67,6 @@ def picked(y_id, conns, queue, channel)
 end
 
 def short_video_pick(y_id)
-  db = DataBase.new
   video_time = get_video_seconds(y_id)
   while video_time > 600 do
     y_id = db.rand_pick
@@ -88,7 +87,9 @@ get '/next' do
     queue.shift
     notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
-      queue << short_video_pick(db.rand_pick)
+      next_q = short_video_pick(db.rand_pick)
+      p next_q
+      queue << next_q
       notification_text = "次のキューが空なのでこれを再生するよ!!"
     else
       notification_text = "次はこの曲を再生するよ!!"
@@ -158,6 +159,7 @@ post '/' do
     return message_response(help)
 
   when "force" then
+    db = DataBase.new
     if params[:channel_name] != "breaktube"
       return message_response("このチャンネルでは利用できないコマンドです。")
     end
