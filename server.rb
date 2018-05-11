@@ -67,6 +67,7 @@ def picked(y_id, conns, queue, channel)
 end
 
 def short_video_pick(y_id)
+  db = DataBase.new
   video_time = get_video_seconds(y_id)
   while video_time > 600 do
     y_id = db.rand_pick
@@ -160,7 +161,6 @@ post '/' do
     return message_response(help)
 
   when "force" then
-    db = DataBase.new
     if params[:channel_name] != "breaktube"
       return message_response("このチャンネルでは利用できないコマンドです。")
     end
