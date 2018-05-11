@@ -67,6 +67,7 @@ def picked(y_id, conns, queue, channel)
 end
 
 def short_video_pick(y_id)
+  db = DataBase.new
   video_time = get_video_seconds(y_id)
   while video_time > 600 do
     y_id = db.rand_pick
