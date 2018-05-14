@@ -26,8 +26,8 @@ results = db.execute("SELECT * FROM playlists")
 
 
 results.each do |arr|
-  title_name = get_title(arr[2])
-  playback_time = get_video_seconds(arr[2])
+  title_name = check_title(arr[2])
+  playback_time = check_video_seconds(arr[2])
   db.execute("INSERT INTO playlists_test (user_name, youtube_id, title_name, playback_time, created_at) VALUES (?, ?, ?, ?, ?)",
              [arr[1], arr[2], title_name, playback_time, arr[3]])
 end
