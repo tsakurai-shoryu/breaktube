@@ -2,7 +2,7 @@
 <html>
   <body>
     <div id="player"></div>
-    <div>現在 <span id="cu">n</span> 人が見てるぽい</div>
+    <div>現在 <span id="cu">n</span> 人が見てるぽい</div>
     <script>
       var tag = document.createElement('script');
 
@@ -63,7 +63,7 @@
       }
       function nextVideo() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
+        xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id, false);
         xhr.onreadystatechange = function() {
           if(xhr.readyState === 4 && xhr.status === 200) {
             console.log(xhr.responseText);
