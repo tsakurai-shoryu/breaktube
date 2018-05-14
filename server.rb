@@ -28,6 +28,7 @@ conns = []
 queue = []
 
 def picked(y_id, conns, queue, channel)
+  db = DataBase.new
   atta = [
     {
       text: "ボタンを選択してください",
