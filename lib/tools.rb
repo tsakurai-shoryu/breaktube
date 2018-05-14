@@ -22,13 +22,13 @@ def link_check?(youtube_id)
   result["items"].size > 0
 end
 
-def get_title(youtube_id)
+def check_title(youtube_id)
   uri = URI.parse("https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id}&key=#{ENV["Y_APIKEY"]}&part=snippet")
   result = JSON.parse(Net::HTTP.get(uri))
-  result["items"][0]["snippet"]["title"]
+  result.dig("items", 0, "snippet", "title")
 end
 
-def get_video_seconds(youtube_id)
+def check_video_seconds(youtube_id)
   uri = URI.parse("https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id}&key=#{ENV["Y_APIKEY"]}&part=contentDetails")
   result = JSON.parse(Net::HTTP.get(uri))
   video_time = result["items"][0]["contentDetails"]["duration"].delete("PT").gsub(/(\d+?[A-Z])/,'\0 ').split
@@ -45,12 +45,13 @@ def get_video_seconds(youtube_id)
 end
 
 def post_stream_notify(notification_text, notification_status, youtube_id)
+  db = DataBase.new
   atta = [
     {
       "fallback": "Required plain-text summary of the attachment.",
       "color": "#36a64f",
       "pretext": notification_text,
-      "title": get_title(youtube_id),
+      "title": db.get_title(youtube_id),
       "title_link": "https://www.youtube.com/watch?v=#{youtube_id}",
       "text": notification_status,
       "thumb_url": "http://i.ytimg.com/vi/#{youtube_id}/default.jpg"

@@ -28,6 +28,7 @@ conns = []
 queue = []
 
 def picked(y_id, conns, queue, channel)
+  db = DataBase.new
   atta = [
     {
       text: "ボタンを選択してください",
@@ -53,7 +54,7 @@ def picked(y_id, conns, queue, channel)
   ]
   p atta
   if channel == "breaktube" or channel == "breaktube-log"
-    y_id = short_video_pick(y_id)
+    y_id = db.short_video_pick
     queue << y_id
     conns.each do |out|
       params = { type: "select", videoid: queue.first}
@@ -64,16 +65,6 @@ def picked(y_id, conns, queue, channel)
            "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
            attachments: atta
          )
-end
-
-def short_video_pick(y_id)
-  db = DataBase.new
-  video_time = get_video_seconds(y_id)
-  while video_time > 600 do
-    y_id = db.rand_pick
-    video_time = get_video_seconds(y_id)
-  end
-  y_id
 end
 
 get '/' do
@@ -88,7 +79,7 @@ get '/next' do
     queue.shift
     notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
-      queue << short_video_pick(db.rand_pick)
+      queue << db.short_video_pick
       notification_text = "次のキューが空なのでこれを再生するよ!!"
     else
       notification_text = "次はこの曲を再生するよ!!"
@@ -144,7 +135,7 @@ post '/' do
     uname = params[:user_name]
 
     if db.youtube_id_search?(y_id)
-      queue << y_id if get_video_seconds(y_id) <= 600
+      queue << y_id if check_video_seconds(y_id) <= 600
       return message_response("すでに存在するIDです。")
     end
     return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
