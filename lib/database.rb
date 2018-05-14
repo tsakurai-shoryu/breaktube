@@ -53,7 +53,7 @@ EOS
   end
 
   def short_video_pick
-    db = DataBase.new
+    db = SQLite3::DataBase.new @dbenv
     db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 ").flatten.sample
   end
 
