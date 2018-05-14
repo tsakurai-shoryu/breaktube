@@ -17,14 +17,26 @@ class DataBase
 
   def playlists_insert(user_name,youtube_id)
     c_at = Time.now.to_i
+    title_name = check_title(youtube_id)
+    playback_time = check_video_seconds(youtube_id)
     db = SQLite3::Database.new @dbenv
-    db.execute("INSERT INTO playlists (user_name, youtube_id, created_at) VALUES (?, ?, ?)",
-               [user_name, youtube_id, c_at])
+    db.execute("INSERT INTO playlists (user_name, youtube_id, title_name, playback_time, created_at) VALUES (?, ?, ?, ?, ?)",
+               [user_name, youtube_id, title_name, playback_time, c_at])
   end
 
   def playlists_count
     db = SQLite3::Database.new @dbenv
     db.execute("SELECT COUNT(1) FROM playlists").flatten[0].to_i
+  end
+
+  def get_title(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("SELECT title_name FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0]
+  end
+
+  def get_video_seconds(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("SELECT playback_time FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0].to_i
   end
 
   def rand_pick(range: 0)
@@ -38,6 +50,11 @@ EOS
     sql << "ORDER BY id DESC limit #{range}" if range != 0
     sql << ")"
     db.execute(sql).flatten.sample
+  end
+
+  def short_video_pick
+    db = DataBase.new
+    db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 ").flatten.sample
   end
 
   def ranking_pick
