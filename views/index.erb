@@ -2,7 +2,7 @@
 <html>
   <body>
     <div id="player"></div>
-    <div>現在 <span id="cu">n</span> 人が見てるぽい</div>
+    <div>現在 <span id="cu">n</span> 人が見てるぽい</div>
     <script>
       var tag = document.createElement('script');
 
@@ -62,17 +62,26 @@
         }
       }
       function nextVideo() {
+        var nextVideoStatus = '';
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
-        xhr.onreadystatechange = function() {
-          if(xhr.readyState === 4 && xhr.status === 200) {
-            console.log(xhr.responseText);
-            if(xhr.responseText !== "") {
-              player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
+        while (true) {
+          xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
+          xhr.onreadystatechange = function() {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+              console.log(xhr.responseText);
+              if(xhr.responseText !== "") {
+                player.loadVideoById({videoId: xhr.responseText, startSeconds: 0});
+                nextVideoStatus = 'success';
+              } else {
+                nextVideoStatus = 'failed';
+              }
             }
-            player.playVideoAt();
+          }
+          if (nextVideoStatus === 'success') {
+            break;
           }
         }
+        player.playVideoAt();
         xhr.send();
       }
       function stopVideo() {
