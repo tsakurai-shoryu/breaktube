@@ -189,14 +189,12 @@ post '/results' do
 end
 
 get '/grid' do
-  @page = [params[:page].to_i, 0].max
-  @list = DataBase.new.list(@page)
+  @list = DataBase.new.all
   erb :grid
 end
 
 get '/list' do
-  @page = [params[:page].to_i, 0].max
-  @list = DataBase.new.list(@page)
+  @list = DataBase.new.all
   erb :list
 end
 
