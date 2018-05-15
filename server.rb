@@ -6,7 +6,7 @@ require './lib/tools.rb'
 require './lib/database.rb'
 
 set server: "thin", connections: [], history_file: "history.yml"
-set :public, File.dirname(__FILE__) + '/public'
+set :public_folder, File.dirname(__FILE__) + '/static'
 
 help =<<EOS
 breaktubeとは？
