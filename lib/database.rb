@@ -76,4 +76,16 @@ EOS
     end
     ranking
   end
+
+  def list(page)
+    db = SQLite3::Database.new @dbenv
+    limit = 50 # マジックナンバーである
+    offset = page * limit
+    db.execute("select youtube_id, user_name, title_name from playlists order by id desc limit #{limit} offset #{offset}")
+  end
+
+  def all
+    db = SQLite3::Database.new @dbenv
+    db.execute("select youtube_id, user_name, title_name from playlists order by id desc")
+  end
 end

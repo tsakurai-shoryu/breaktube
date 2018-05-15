@@ -6,6 +6,7 @@ require './lib/tools.rb'
 require './lib/database.rb'
 
 set server: "thin", connections: [], history_file: "history.yml"
+set :public_folder, File.dirname(__FILE__) + '/public'
 
 help =<<EOS
 breaktubeとは？
@@ -185,6 +186,16 @@ post '/results' do
     "不正な値です。bot管理者に連絡してください。"
   end
   ""
+end
+
+get '/grid' do
+  @list = DataBase.new.all
+  erb :grid
+end
+
+get '/list' do
+  @list = DataBase.new.all
+  erb :list
 end
 
 Thread.new do
