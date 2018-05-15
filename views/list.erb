@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>登録済リスト</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <style>
+      li {
+        margin: 5px;
+        float: left;
+        list-style: none;
+      }
+    </style>
+    <script>
+      function myFunction() {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById('myInput');
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("youtube_ul");
+        li = ul.getElementsByTagName('li');
+
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link" href="/list?page=<%= @page - 1 %>">prev</a></li>
+          <li class="page-item"><a class="page-link" href="/list">top</a></li>
+          <li class="page-item"><a class="page-link" href="/list?page=<%= @page + 1 %>">next</a></li>
+        </ul>
+      </nav>
+      <form>
+        <div class="form-group">
+          <input type="text" id="myInput" onkeyup="myFunction()" class="form-control" placeholder="Search for names..">
+        </div>
+      </div>
+      <ul class="list-group" id="youtube_ul">
+        <% @list.each do |yid, name, title| %>
+          <li class="list-group-item">
+            <a href="https://www.youtube.com/watch?v=<%= yid %>"><%= title %></a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </body>
+</html>
