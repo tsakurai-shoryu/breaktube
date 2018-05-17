@@ -60,11 +60,10 @@ EOS
 
   def short_video_pick
     db = SQLite3::Database.new @dbenv
-#    finished = db.execute("SELECT youtube_id FROM finishlists").flatten.join('","')
-#    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 AND youtube_id not in (\"#{finished}\")").flatten.sample
-#    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample if y_id.nil?
-#    y_id
-    db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample
+    finished = db.execute("SELECT youtube_id FROM finishlists").flatten.join('","')
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 AND youtube_id not in (\"#{finished}\")").flatten.sample
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample if y_id.nil?
+    y_id
   end
 
   def ranking_pick
