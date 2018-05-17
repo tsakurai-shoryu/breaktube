@@ -77,6 +77,7 @@ get '/next' do
   finished_id = params[:videoid]
   first_switcher = queue.first == finished_id
   if first_switcher
+#    db.finishlists_insert(queue[0])
     queue.shift
     notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
     if queue.empty?
