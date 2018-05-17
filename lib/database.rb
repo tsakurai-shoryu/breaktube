@@ -24,6 +24,12 @@ class DataBase
                [user_name, youtube_id, title_name, playback_time, c_at])
   end
 
+  def finishlists_insert(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("INSERT INTO finishlists (youtube_id) VALUES (?)",
+               [youtube_id])
+  end
+
   def playlists_count
     db = SQLite3::Database.new @dbenv
     db.execute("SELECT COUNT(1) FROM playlists").flatten[0].to_i
@@ -54,7 +60,10 @@ EOS
 
   def short_video_pick
     db = SQLite3::Database.new @dbenv
-    db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 ").flatten.sample
+    finished = db.execute("SELECT youtube_id FROM finishlists").flatten.join('","')
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 AND youtube_id not in (\"#{finished}\")").flatten.sample
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample if y_id.nil?
+    y_id
   end
 
   def ranking_pick
@@ -79,7 +88,7 @@ EOS
 
   def list(page)
     db = SQLite3::Database.new @dbenv
-    limit = 50 # マジックナンバーである
+    limit = 50 # マジックナンバーである
     offset = page * limit
     db.execute("select youtube_id, user_name, title_name from playlists order by id desc limit #{limit} offset #{offset}")
   end
