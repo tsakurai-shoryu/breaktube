@@ -16,6 +16,7 @@ module App
     queue = []
 
     def picked(y_id, conns, queue, channel)
+      db = DataBase.new
       atta = [
         {
           text: "ボタンを選択してください",
@@ -41,6 +42,7 @@ module App
       ]
       p atta
       if channel == "breaktube" or channel == "breaktube-log"
+        y_id = db.short_video_pick
         queue << y_id
         conns.each do |out|
           params = { type: "select", videoid: queue.first}
@@ -58,10 +60,11 @@ module App
       finished_id = params[:videoid]
       first_switcher = queue.first == finished_id
       if first_switcher
+        db.finishlists_insert(queue[0])
         queue.shift
         notification_status = "視聴者数 >>> #{conns.count} キュー >>> #{queue.count}"
         if queue.empty?
-          queue << db.rand_pick
+          queue << db.short_video_pick
           notification_text = "次のキューが空なのでこれを再生するよ!!"
         else
           notification_text = "次はこの曲を再生するよ!!"
@@ -117,7 +120,7 @@ module App
         uname = params[:user_name]
 
         if db.youtube_id_search?(y_id)
-          queue << y_id
+          queue << y_id if check_video_seconds(y_id) <= 600
           return message_response("すでに存在するIDです。")
         end
         return message_response("youtubeに存在しないIDです。") unless link_check?(y_id)
@@ -167,6 +170,16 @@ module App
         "不正な値です。bot管理者に連絡してください。"
       end
       ""
+    end
+
+    get '/grid' do
+      @list = DataBase.new.all
+      erb :grid
+    end
+
+    get '/list' do
+      @list = DataBase.new.all
+      erb :list
     end
 
     Thread.new do

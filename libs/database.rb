@@ -17,14 +17,32 @@ class DataBase
 
   def playlists_insert(user_name,youtube_id)
     c_at = Time.now.to_i
+    title_name = check_title(youtube_id)
+    playback_time = check_video_seconds(youtube_id)
     db = SQLite3::Database.new @dbenv
-    db.execute("INSERT INTO playlists (user_name, youtube_id, created_at) VALUES (?, ?, ?)",
-               [user_name, youtube_id, c_at])
+    db.execute("INSERT INTO playlists (user_name, youtube_id, title_name, playback_time, created_at) VALUES (?, ?, ?, ?, ?)",
+               [user_name, youtube_id, title_name, playback_time, c_at])
+  end
+
+  def finishlists_insert(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("INSERT INTO finishlists (youtube_id) VALUES (?)",
+               [youtube_id])
   end
 
   def playlists_count
     db = SQLite3::Database.new @dbenv
     db.execute("SELECT COUNT(1) FROM playlists").flatten[0].to_i
+  end
+
+  def get_title(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("SELECT title_name FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0]
+  end
+
+  def get_video_seconds(youtube_id)
+    db = SQLite3::Database.new @dbenv
+    db.execute("SELECT playback_time FROM playlists WHERE youtube_id = \"#{youtube_id}\"").flatten[0].to_i
   end
 
   def rand_pick(range: 0)
@@ -38,6 +56,14 @@ EOS
     sql << "ORDER BY id DESC limit #{range}" if range != 0
     sql << ")"
     db.execute(sql).flatten.sample
+  end
+
+  def short_video_pick
+    db = SQLite3::Database.new @dbenv
+    finished = db.execute("SELECT youtube_id FROM finishlists").flatten.join('","')
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600 AND youtube_id not in (\"#{finished}\")").flatten.sample
+    y_id = db.execute("SELECT youtube_id FROM playlists WHERE playback_time <= 600").flatten.sample if y_id.nil?
+    y_id
   end
 
   def ranking_pick
@@ -58,5 +84,17 @@ EOS
       ranking << "#{arr[2]}位：#{arr[0]}  #{arr[1]}曲\n"
     end
     ranking
+  end
+
+  def list(page)
+    db = SQLite3::Database.new @dbenv
+    limit = 50 # マジックナンバーである
+    offset = page * limit
+    db.execute("select youtube_id, user_name, title_name from playlists order by id desc limit #{limit} offset #{offset}")
+  end
+
+  def all
+    db = SQLite3::Database.new @dbenv
+    db.execute("select youtube_id, user_name, title_name from playlists order by id desc")
   end
 end
