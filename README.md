@@ -10,6 +10,8 @@ CREATE TABLE playlists(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   user_name TEXT NOT NULL,
   youtube_id TEXT NOT NULL,
+  title_name TEXT NOT NULL,
+  playback_time INT NOT NULL,
   created_at INT NOT NULL
 );
 
