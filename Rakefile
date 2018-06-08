@@ -6,7 +6,7 @@ end
 namespace :db do
   desc "migrate db"
   task migrate: :environment do
-    DB = Sequel.sqlite("./db/breaktube-dev.db")
+    DB = Sequel.sqlite(ENV.fetch("DB_PATH","breaktube-prod.db"))
     Sequel.extension :migration
     Sequel::Migrator.run(DB, './db/migrations/', use_transactions: true)
   end

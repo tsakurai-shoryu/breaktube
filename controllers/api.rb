@@ -173,16 +173,6 @@ module App
       ""
     end
 
-    get '/grid' do
-      @list = DataBase.new.all
-      erb :grid
-    end
-
-    get '/list' do
-      @list = DataBase.new.all
-      erb :list
-    end
-
     Thread.new do
       loop do
         sleep 15
