@@ -9,6 +9,7 @@ breaktubeとは？
 `/breaktube user_ranking` => breaktubeに曲を登録した数のランキングTOP10が確認できます。
 EOS
 
+DB ||= Sequel.connect("sqlite://#{ENV.fetch('DB_PATH', "breaktube-prod.db")}")
 
 module App
   class Base < ::Sinatra::Base
