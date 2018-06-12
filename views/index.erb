@@ -17,7 +17,8 @@
           width: '640',
           events: {
             'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+            'onStateChange': onPlayerStateChange,
+            'onError': onPlayerError,
           }
         });
       }
@@ -61,6 +62,12 @@
           nextVideo();
         }
       }
+
+      function onPlayerError(event) {
+        console.log(event.data);
+        nextVideo();
+      }
+
       function nextVideo() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/next?videoid=' + player.getVideoData().video_id);
