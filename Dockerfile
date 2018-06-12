@@ -10,4 +10,4 @@ RUN cd /app \
 
 VOLUME ["/app/db"]
 
-CMD ["bundle", "exec", "ruby", "server.rb", "-o", "0.0.0.0"]
+CMD ["bundle", "exec", "rackup", "-o", "0.0.0.0"]

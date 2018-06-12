@@ -4,7 +4,7 @@ services:
     container_name: "breaktube"
     build: .
     ports:
-      - "4567:4567"
+      - "4567:9292"
     volumes:
       -  "./db:/app/db"
     environment:
