@@ -76,6 +76,6 @@ EOS
   end
 
   def all
-    DB[:playlists].select(:youtube_id, :user_name, :title_name).reverse_order(:id).map{ |s| s.values }
+    DB[:playlists].select(:youtube_id, :user_name, :title_name, :playback_time).reverse_order(:id).map{ |s| s.values }
   end
 end
