@@ -36,7 +36,7 @@ class DataBase
   def rand_pick(range: 0)
     sql = DB[:playlists].reverse_order(:id)
     sql = sql.limit(range) if range != 0
-    sql.map(:youtube_id).sample
+    (sql.map(:youtube_id) - ignore_ids).sample
   end
 
   def short_video_pick
@@ -77,5 +77,13 @@ EOS
 
   def all
     DB[:playlists].select(:youtube_id, :user_name, :title_name, :playback_time).reverse_order(:id).map{ |s| s.values }
+  end
+
+  def ignore(yid)
+    DB[:ignorelists].insert(youtube_id: yid)
+  end
+
+  def ignore_ids
+    DB[:ignorelists].map(:youtube_id)
   end
 end

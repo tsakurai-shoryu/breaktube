@@ -66,6 +66,10 @@ class DatabaseTest < TestHelper
 
     DB[:playlists].insert(user_name: "user1", youtube_id: "BsB-7wZv_kI", title_name: "再生済", playback_time: 100, created_at: Time.now.to_i)
     assert_equal db.rand_pick(range: 1), "BsB-7wZv_kI"
+
+    DB[:ignorelists].insert(youtube_id: "PumFnlu9EIY")
+    DB[:ignorelists].insert(youtube_id: "o1jAMSQyVPc")
+    assert_equal db.rand_pick(range: 3), "BsB-7wZv_kI"
   end
 
   def test_short_video_pick
@@ -101,10 +105,26 @@ class DatabaseTest < TestHelper
     assert_equal db.all, [["o1jAMSQyVPc", "user2", "初音ミク「メルト」"], ["PumFnlu9EIY", "user1", "新・豪血寺一族 －煩悩開放－　レッツゴー！陰陽師　PV"]]
   end
 
+  def test_ignore
+    reset_db
+    assert_equal DB[:ignorelists].count, 0
+    db.ignore("o1jAMSQyVPc")
+    assert_equal DB[:ignorelists].count, 1
+  end
+
+  def ignore_ids
+    reset_db
+    DB[:ignorelists].insert(youtube_id: "o1jAMSQyVPc")
+    DB[:ignorelists].insert(youtube_id: "PumFnlu9EIY")
+
+    assert_equal db.ignore_ids, ["o1jAMSQyVPc", "PumFnlu9EIY"]
+  end
+
   private
   def reset_db
     DB[:playlists].delete
     DB[:finishlists].delete
+    DB[:ignorelists].delete
   end
 
   def db
