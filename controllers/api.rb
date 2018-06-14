@@ -42,14 +42,6 @@ module App
         }
       ]
       p atta
-      if channel == "breaktube" or channel == "breaktube-log"
-        y_id = db.short_video_pick
-        queue << y_id
-        conns.each do |out|
-          params = { type: "select", videoid: queue.first}
-          out << "data: #{params.to_json}\n\n"
-        end
-      end
       message_response(
               "この動画を評価してね！\n https://www.youtube.com/watch?v=#{y_id}",
               attachments: atta
