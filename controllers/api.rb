@@ -1,14 +1,3 @@
-HELP=<<EOS
-breaktubeとは？
-
-みんなが自由に追加することができるプレイリストのようなものです。
-`/breaktube` => リストからランダムに再生。
-`/breaktube lastest10` => 最新追加10曲からランダムに再生。数字部分は変更可能。
-`/breaktube add=ID` => 動画のリンクをadd=の後ろに入力するとbreaktubeに動画を追加。
-`/breaktube count` => 今breaktubeに登録されている曲数がわかる。
-`/breaktube user_ranking` => breaktubeに曲を登録した数のランキングTOP10が確認できます。
-EOS
-
 DB ||= Sequel.connect("sqlite://#{ENV.fetch('DB_PATH', "breaktube-prod.db")}")
 
 module App
@@ -132,7 +121,7 @@ module App
         return message_response("ID追加に成功しました。")
 
       when /help/ then
-        return message_response(HELP)
+        return message_response(Conf['help'])
 
       when "force" then
         if params[:channel_name] != "breaktube"
